@@ -21,4 +21,5 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     #  <domain>/fib/
     path('fib/', include('fib.urls')),
+    path('', include('fib.urls')),
 ]
