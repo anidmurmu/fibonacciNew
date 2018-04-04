@@ -4,21 +4,21 @@ from django.shortcuts import render
 from .forms import NumberForm
 from django.views.generic import TemplateView
 
-# returns nth term of fibonacci series and time taken to get it
-def nth_fibonacci( request ):
-	start_time = timezone.now()
-	start_time = '{:%S}.{:03d}'.format(start_time, start_time.microsecond // 1000)
-	#term = int( request.POST['num'] )
-	#term = request.POST.get( 'num' )
-	#term = str( term ).strip()
-	#term = int( term )
-	#name = request.POST['name']
-	nth_term = get_fibonacci( 6 )
-	end_time = timezone.now()
-	end_time = '{:%S}.{:03d}'.format(end_time, end_time.microsecond // 1000)
-	time = time_total( start_time, end_time )
-	#return render( request, 'fib/index.html', {'nth_term':  nth_term, 'time': name } )
-	return render( request, 'fib/index.html', {'nth_term':  nth_term, 'time': time } )
+def home(request):
+    if request.method == 'POST':
+        form = NumberForm(request.POST)
+        if form.is_valid():
+        	start_time = timezone.now()
+        	start_time = '{:%S}.{:03d}'.format(start_time, start_time.microsecond // 1000)
+	        nth_term = form.cleaned_data['nth_term']
+	        nth_term = get_fibonacci( nth_term )
+	        end_time = timezone.now()
+	        end_time = '{:%S}.{:03d}'.format(end_time, end_time.microsecond // 1000)
+	        time = time_total( start_time, end_time )
+	        return render( request, 'fib/index.html', {'form': form, 'nth_term': nth_term, 'time': time } )
+    else:
+        form = NumberForm()
+    return render(request, 'fib/index.html', {'form': form})
 
 # returns the nth term from fibonacci series
 def get_fibonacci( term ):
@@ -44,23 +44,4 @@ def time_total( start_time, end_time ):
 	st_total_milli = int( st_time_milli[0] ) * 1000  + int( st_time_milli[1] )
 	end_total_milli =int( end_time_milli[0] )  * 1000 + int( end_time_milli[1] )
 	time_differ = end_total_milli - st_total_milli
-	second = time_differ / 1000
-	milli = ( time_differ % 1000 )
-	result = str( second ) + ':' + str( milli ) + "sec"
-	return result
-
-def home(request):
-    if request.method == 'POST':
-        form = NumberForm(request.POST)
-        if form.is_valid():
-	        nth_term = form.cleaned_data['nth_term']
-	        nth_term = get_fibonacci( nth_term )
-			start_time = timezone.now()
-			start_time = '{:%S}.{:03d}'.format(start_time, start_time.microsecond // 1000)
-	        #end_time = timezone.now()
-			#end_time = '{:%S}.{:03d}'.format(end_time, end_time.microsecond // 1000)
-			#time = time_total( start_time, end_time )
-	        return render(request, 'fib/index.html', {'form': form, 'nth_term': nth_term })
-    else:
-        form = NumberForm()
-    return render(request, 'fib/index.html', {'form': form})
+	return str( time_differ ) + ' milli sec'
